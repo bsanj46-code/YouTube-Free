@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101213">
+  <meta name="description" content="YouTube Free: видео, избранное и удобный просмотр на телефоне и планшете. Веб-версия без собственной рекламы.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+  <title>YouTube Free — веб-версия</title>
+</head>
+<body>
+  <a class="skip" href="#main">Перейти к видео</a>
+  <header class="header wrap">
+    <a class="brand" href="./" aria-label="YouTube Free — главная">
+      <img src="./icon.svg" width="43" height="43" alt="">
+      <span>YouTube <b>Free</b><small>Ваше место для видео</small></span>
+      <span class="web-badge">WEB</span>
+    </a>
+    <div class="header-actions"><button id="install" class="button soft">Установить <span aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></span></button>
+      <a class="button apk" href="https://github.com/bsanj46-code/YouTube-Free/releases/latest/download/YouTube-Free.apk">Android APK <span aria-hidden="true">↓</span></a></div>
+  </header>
+  <main id="main" class="wrap">
+    <section class="intro" aria-labelledby="intro-title">
+      <p class="eyebrow"><span class="dot"></span> ОДНА ССЫЛКА. ЛЮБОЙ ЭКРАН.</p>
+      <h1 id="intro-title">Что <em>посмотрим?</em></h1>
+      <p class="intro-copy">Любимые видео — в одном спокойном месте.</p>
+      <form id="search-form" class="search" role="search">
+        <label for="query" class="sr-only">Ссылка на видео или название</label>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>
+        <input id="query" type="search" placeholder="Вставьте ссылку или введите название" autocomplete="off" required maxlength="1000">
+        <button type="submit" class="button primary" id="search-submit">Найти <span aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></span></button>
+      </form>
+      <p class="search-hint" id="search-hint">Ссылка откроет видео здесь. Поиск по названию — на YouTube.</p>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+    <nav class="tabs" aria-label="Библиотека">
+      <button id="watch-tab" class="tab active" aria-pressed="true"><span aria-hidden="true">▷</span> Смотреть</button>
+      <button id="favorites-tab" class="tab" aria-pressed="false"><span aria-hidden="true">☆</span> Избранное <span class="count" id="favorites-count">0</span></button>
+      <span class="local-note">Сохраняется на этом устройстве</span>
+    </nav>
+    <section id="watch-panel" aria-label="Просмотр">
+      <div class="watch-layout">
+        <article class="viewer" id="viewer">
+          <div class="video-stage" id="video-stage">
+            <div class="placeholder" id="placeholder">
+              <div class="play-orbit"><span aria-hidden="true">▶</span></div>
+              <h2>Начните с одного видео</h2>
+              <p>Вставьте ссылку YouTube в строку выше.<br>А мы сохраним всё удобное под рукой.</p>
+              <button class="text-button" id="focus-search">Открыть видео <span aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></span></button>
+            </div>
+            <div id="player-mount" hidden></div>
+            <button id="exit-stage" class="exit-stage" hidden aria-label="Вернуться из полноэкранного режима">× Назад</button>
+          </div>
+          <div class="video-info" id="video-info" hidden>
+            <div><p class="eyebrow">СЕЙЧАС СМОТРИМ</p><h2 id="video-title"></h2><p id="video-author"></p></div>
+            <div class="player-actions"><button id="favorite-current" class="button soft" aria-pressed="false">☆ В избранное</button>
+              <button id="fullscreen" class="icon-button" aria-label="На весь экран" title="На весь экран">⛶</button>
+              <a id="youtube-link" class="text-button" target="_blank" rel="noopener noreferrer">На YouTube <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></div>
+          </div>
+          <p id="player-error" class="player-error" role="status" hidden></p>
+        </article>
+        <aside class="side">
+          <div class="tip-card"><span class="mini-icon" aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></span><p class="eyebrow">МАЛЕНЬКИЕ УДОБСТВА</p><h2>Больше видео.<br>Меньше лишнего.</h2><ul><li><span aria-hidden="true">☆</span><div><b>Своя коллекция</b><p>Отмечайте видео звёздочкой.</p></div></li><li><span aria-hidden="true">⛶</span><div><b>На большом экране</b><p>Поверните устройство или нажмите ⛶.</p></div></li><li><span aria-hidden="true">＋</span><div><b>Всегда под рукой</b><p>Добавьте сайт на главный экран.</p></div></li></ul></div>
+          <a class="android-card" href="https://github.com/bsanj46-code/YouTube-Free/releases/latest/download/YouTube-Free.apk"><div><small>ПРЕДПОЧИТАЕТЕ ПРИЛОЖЕНИЕ?</small><h3>YouTube Free для Android</h3><p>Один APK для телефона и планшета</p></div><span aria-hidden="true">↓</span></a>
+        </aside>
+      </div>
+      <section id="results-panel" hidden aria-labelledby="results-title"><div class="section-heading"><h2 id="results-title">Результаты поиска</h2><span id="results-note"></span></div><div id="results" class="video-grid"></div><button id="more-results" class="button soft" hidden>Показать ещё</button></section>
+    </section>
+    <section id="favorites-panel" hidden aria-labelledby="favorites-title"><div class="section-heading"><h2 id="favorites-title">Ваше избранное</h2><span>Только то, что нравится вам</span></div><div id="favorites" class="video-grid"></div><div class="empty" id="favorites-empty"><span aria-hidden="true">☆</span><h3>Здесь будут ваши любимые видео</h3><p>Откройте видео и нажмите «В избранное».</p><button id="back-watch" class="button soft">Найти первое видео <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></div></section>
+    <footer><span>YouTube Free <b>·</b> Веб-версия</span><p>Без собственной рекламы. Официальный плеер YouTube может показывать рекламу.<br>Неофициальный проект. Для просмотра нужен интернет.</p><button id="about" class="text-button">О просмотре и данных <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></footer>
+  </main>
+  <dialog id="install-dialog"><button class="dialog-close" data-close aria-label="Закрыть">×</button><p class="eyebrow">ВСЕГДА РЯДОМ</p><h2>Добавьте на главный экран</h2><p>На Android откройте меню Chrome <b>⋮</b> → <b>«Установить приложение»</b> или <b>«Добавить на главный экран»</b>.</p><p>На iPhone и iPad: Safari → «Поделиться» → «На экран Домой».</p><p class="muted">Если сайт уже установлен, откройте его значок на главном экране.</p><button class="button primary" data-close>Понятно</button></dialog>
+  <dialog id="about-dialog"><button class="dialog-close" data-close aria-label="Закрыть">×</button><h2>Ваш просмотр, ваши данные</h2><p>Избранное хранится только в этом браузере. Между телефоном и планшетом оно не синхронизируется.</p><p>Видео воспроизводятся в официальном плеере YouTube. YouTube может показывать рекламу, обрабатывать данные просмотра и ограничивать доступность отдельных видео. Нажатие на видео загружает плеер и связывается с YouTube.</p><p>Веб-версия не блокирует рекламу и не обеспечивает фоновое воспроизведение. Кнопка полного экрана работает по нажатию. Поворот включает его автоматически, если это разрешает браузер; иначе плеер разворачивается внутри страницы.</p><p>Поиск по названиям пока открывается на YouTube. Затем вставьте ссылку на найденный ролик в строку поиска здесь.</p><p><a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer">Условия YouTube <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Конфиденциальность Google <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></p><button class="button primary" data-close>Понятно</button></dialog>
+  <noscript><p class="empty">Для просмотра и избранного включите JavaScript в браузере.</p></noscript>
+  <script src="./config.js"></script><script type="module" src="./app.mjs"></script>
+</body>
+</html>
