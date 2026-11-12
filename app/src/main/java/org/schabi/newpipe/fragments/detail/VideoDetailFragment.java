@@ -1487,6 +1487,8 @@ public final class VideoDetailFragment
     /**
      * Follow the physical device only while its main video sheet is open.
      * The player service survives configuration changes, so rotation does not restart the stream.
+     *
+     * @param sensorOrientation physical device orientation in degrees, or unknown
      */
     private void handleVideoRotation(final int sensorOrientation) {
         if (activity == null || binding == null || bottomSheetBehavior == null
