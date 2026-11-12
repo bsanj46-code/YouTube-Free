@@ -6,7 +6,6 @@ import static org.schabi.newpipe.QueueItemMenuUtil.openPopupMenu;
 import static org.schabi.newpipe.extractor.ServiceList.YouTube;
 import static org.schabi.newpipe.ktx.ViewUtils.animate;
 import static org.schabi.newpipe.player.Player.STATE_COMPLETED;
-import static org.schabi.newpipe.player.Player.STATE_PAUSED;
 import static org.schabi.newpipe.player.helper.PlayerHelper.MinimizeMode.MINIMIZE_ON_EXIT_MODE_BACKGROUND;
 import static org.schabi.newpipe.player.helper.PlayerHelper.MinimizeMode.MINIMIZE_ON_EXIT_MODE_NONE;
 import static org.schabi.newpipe.player.helper.PlayerHelper.MinimizeMode.MINIMIZE_ON_EXIT_MODE_POPUP;
@@ -964,12 +963,11 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
         final boolean videoInLandscapeButNotInFullscreen = isLandscape()
                 && !isFullscreen
                 && !player.isAudioOnly();
-        final boolean notPaused = player.getCurrentState() != STATE_COMPLETED
-                && player.getCurrentState() != STATE_PAUSED;
+        final boolean notCompleted = player.getCurrentState() != STATE_COMPLETED;
 
         if (videoInLandscapeButNotInFullscreen
-                && notPaused
-                && !DeviceUtils.isTablet(context)) {
+                && notCompleted
+                && !DeviceUtils.isTv(context)) {
             toggleFullscreen();
         }
     }

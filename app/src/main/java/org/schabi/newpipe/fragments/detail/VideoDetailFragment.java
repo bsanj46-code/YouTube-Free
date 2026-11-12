@@ -35,6 +35,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -99,6 +100,7 @@ import org.schabi.newpipe.player.PlayerType;
 import org.schabi.newpipe.player.event.OnKeyDownListener;
 import org.schabi.newpipe.player.event.PlayerServiceExtendedEventListener;
 import org.schabi.newpipe.player.helper.PlayerHelper;
+import org.schabi.newpipe.player.helper.VideoRotationHelper;
 import org.schabi.newpipe.player.helper.PlayerHolder;
 import org.schabi.newpipe.player.playqueue.PlayQueue;
 import org.schabi.newpipe.player.playqueue.PlayQueueItem;
@@ -228,6 +230,8 @@ public final class VideoDetailFragment
     private TabAdapter pageAdapter;
 
     private ContentObserver settingsContentObserver;
+    private OrientationEventListener videoOrientationListener;
+    private int lastVideoOrientation = VideoRotationHelper.UNKNOWN;
     @Nullable
     private PlayerService playerService;
     private Player player;
@@ -258,9 +262,7 @@ public final class VideoDetailFragment
             // If the video is playing but orientation changed
             // let's make the video in fullscreen again
             checkLandscape();
-        } else if (playerUi.map(ui -> ui.isFullscreen() && !ui.isVerticalVideo()).orElse(false)
-                // Tablet UI has orientation-independent fullscreen
-                && !DeviceUtils.isTablet(activity)) {
+        } else if (playerUi.map(MainPlayerUi::isFullscreen).orElse(false)) {
             // Device is in portrait orientation after rotation but UI is in fullscreen.
             // Return back to non-fullscreen state
             playerUi.ifPresent(MainPlayerUi::toggleFullscreen);
@@ -327,6 +329,13 @@ public final class VideoDetailFragment
 
         setupBroadcastReceiver();
 
+        videoOrientationListener = new OrientationEventListener(activity) {
+            @Override
+            public void onOrientationChanged(final int orientation) {
+                handleVideoRotation(orientation);
+            }
+        };
+
         settingsContentObserver = new ContentObserver(new Handler()) {
             @Override
             public void onChange(final boolean selfChange) {
@@ -350,6 +359,7 @@ public final class VideoDetailFragment
     @Override
     public void onPause() {
         super.onPause();
+        videoOrientationListener.disable();
         if (currentWorker != null) {
             currentWorker.dispose();
         }
@@ -364,6 +374,9 @@ public final class VideoDetailFragment
     @Override
     public void onResume() {
         super.onResume();
+        if (videoOrientationListener.canDetectOrientation()) {
+            videoOrientationListener.enable();
+        }
         if (DEBUG) {
             Log.d(TAG, "onResume() called");
         }
@@ -400,6 +413,7 @@ public final class VideoDetailFragment
     @Override
     public void onDestroy() {
         super.onDestroy();
+        videoOrientationListener.disable();
 
         // Stop the service when user leaves the app with double back press
         // if video player is selected. Otherwise unbind
@@ -1469,6 +1483,45 @@ public final class VideoDetailFragment
     // Orientation listener
     //////////////////////////////////////////////////////////////////////////*/
 
+
+    /**
+     * Follow the physical device only while its main video sheet is open.
+     * The player service survives configuration changes, so rotation does not restart the stream.
+     */
+    private void handleVideoRotation(final int sensorOrientation) {
+        if (activity == null || binding == null || bottomSheetBehavior == null
+                || bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED
+                || !isPlayerAvailable() || !player.videoPlayerSelected() || player.isAudioOnly()
+                || player.getCurrentState() == Player.STATE_COMPLETED
+                || DeviceUtils.isTv(activity) || DeviceUtils.isInMultiWindow(activity)) {
+            return;
+        }
+        final int orientation = VideoRotationHelper.stableOrientation(sensorOrientation);
+        if (orientation == VideoRotationHelper.UNKNOWN || orientation == lastVideoOrientation) {
+            return;
+        }
+        final int previous = lastVideoOrientation;
+        lastVideoOrientation = orientation;
+        // Do not undo an explicit portrait fullscreen button on the first sensor reading.
+        if (previous == VideoRotationHelper.UNKNOWN
+                && orientation == VideoRotationHelper.PORTRAIT) {
+            return;
+        }
+        final boolean landscape = orientation == VideoRotationHelper.LANDSCAPE;
+        final int requested = landscape ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+        if (activity.getRequestedOrientation() != requested) {
+            activity.setRequestedOrientation(requested);
+        }
+        if (DeviceUtils.isLandscape(activity) == landscape) {
+            player.UIs().get(MainPlayerUi.class).ifPresent(ui -> {
+                if (ui.isFullscreen() != landscape) {
+                    ui.toggleFullscreen();
+                }
+            });
+        }
+    }
+
     private void restoreDefaultOrientation() {
         if (isPlayerAvailable() && player.videoPlayerSelected()) {
             toggleFullscreenIfInFullscreenMode();
@@ -1478,7 +1531,7 @@ public final class VideoDetailFragment
         // User can tap on Play button and video will be in fullscreen mode again
         // Note for tablet: trying to avoid orientation changes since it's not easy
         // to physically rotate the tablet every time
-        if (activity != null && !DeviceUtils.isTablet(activity)) {
+        if (activity != null && !DeviceUtils.isTv(activity)) {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
     }
@@ -2390,13 +2443,15 @@ public final class VideoDetailFragment
                                 && isPlayerAvailable()
                                 && player.isPlaying()
                                 && !isFullscreen()
-                                && !DeviceUtils.isTablet(activity)) {
+                                && !DeviceUtils.isTv(activity)) {
                             player.UIs().get(MainPlayerUi.class)
                                     .ifPresent(MainPlayerUi::toggleFullscreen);
                         }
                         setOverlayLook(binding.appBarLayout, behavior, 1);
                         break;
                     case BottomSheetBehavior.STATE_COLLAPSED:
+                        restoreDefaultOrientation();
+                        lastVideoOrientation = VideoRotationHelper.UNKNOWN;
                         moveFocusToMainFragment(true);
                         manageSpaceAtTheBottom(false);
 
