@@ -209,7 +209,12 @@ $('fullscreen').addEventListener('click', async () => {
 });
 $('exit-stage').addEventListener('click', () => { manuallyClosedLandscape = true; leaveRotationView(); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape') { manuallyClosedLandscape = true; leaveRotationView(); } });
-document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && rotationExpanded) { manuallyClosedLandscape = true; leaveRotationView(); } });
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) {
+    if (rotationExpanded) manuallyClosedLandscape = true;
+    leaveRotationView();
+  }
+});
 screen.orientation?.addEventListener('change', updateRotationView);
 window.addEventListener('orientationchange', () => setTimeout(updateRotationView, 200));
 matchMedia('(orientation: landscape)').addEventListener('change', updateRotationView);

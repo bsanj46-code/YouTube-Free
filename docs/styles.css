@@ -15,3 +15,6 @@ footer{border-top:1px solid var(--line);margin-top:46px;padding:24px 0 32px;disp
 .video-stage.rotation-view .exit-stage,.video-stage:fullscreen .exit-stage{top:5px;right:12px;padding:6px 12px}
 
 .arrow{display:inline-block;width:14px;height:14px;stroke:currentColor;stroke-width:1.7;vertical-align:middle;flex-shrink:0}.mini-icon .arrow{width:21px;height:21px}.search .button .arrow{width:13px;height:13px}.play-orbit span{font-size:0}.play-orbit span:before{content:"";display:block;border-top:11px solid transparent;border-bottom:11px solid transparent;border-left:18px solid var(--lime)}
+
+.video-stage:has(>.placeholder:not([hidden])){aspect-ratio:auto}
+@media(min-width:761px) and (max-width:900px){.watch-layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1.4fr 1fr}.android-card{align-self:start}}
