@@ -43,6 +43,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.SubtitleView;
 import com.google.android.exoplayer2.video.VideoSize;
 
@@ -285,8 +286,9 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
     }
 
     private void initVideoPlayer() {
-        // restore last resize mode
-        setResizeMode(PlayerHelper.retrieveResizeModeFromPrefs(player));
+        // Fill the fullscreen viewport; keep the saved scale for the inline player.
+        setResizeMode(isFullscreen ? AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                : PlayerHelper.retrieveResizeModeFromPrefs(player));
         binding.getRoot().setLayoutParams(new FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
     }
 
@@ -941,6 +943,8 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
         }
 
         isFullscreen = !isFullscreen;
+        setResizeMode(isFullscreen ? AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                : PlayerHelper.retrieveResizeModeFromPrefs(player));
         if (isFullscreen) {
             // Android needs tens milliseconds to send new insets but a user is able to see
             // how controls changes it's position from `0` to `nav bar height` padding.
