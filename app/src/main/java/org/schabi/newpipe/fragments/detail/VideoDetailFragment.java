@@ -2181,7 +2181,8 @@ public final class VideoDetailFragment
 
         player.UIs().get(MainPlayerUi.class).ifPresent(MainPlayerUi::checkLandscape);
         // Let's give a user time to look at video information page if video is not playing
-        if (globalScreenOrientationLocked(activity) && !player.isPlaying()) {
+        if (globalScreenOrientationLocked(activity) && !player.isPlaying()
+                && player.getCurrentState() != Player.STATE_PAUSED) {
             player.play();
         }
     }
