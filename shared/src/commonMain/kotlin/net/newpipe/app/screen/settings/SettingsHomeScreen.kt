@@ -72,22 +72,7 @@ fun SettingsHomeScreen(
                             Destination.HistorySettings
                         )
 
-                        SettingsCategoryType.CONTENT -> navigator.navigateTo(
-                            Destination.ContentSettings
-                        )
-
-                        SettingsCategoryType.NOTIFICATIONS -> navigator.navigateTo(
-                            Destination.NotificationSettings
-                        )
-
-                        SettingsCategoryType.UPDATES -> navigator.navigateTo(
-                            Destination.UpdateSettings
-                        )
-
-                        SettingsCategoryType.BACKUP_RESTORE -> navigator.navigateTo(
-                            Destination.BackupRestoreSettings
-                        )
-
+                        // TODO: wire remaining sub-screens as they are migrated
                         else -> Unit
                     }
                 }

@@ -40,8 +40,8 @@ configure<ApplicationExtension> {
     namespace = NEWPIPE_APPLICATION_ID_OLD
 
     defaultConfig {
-        applicationId = NEWPIPE_APPLICATION_ID_OLD
-        resValue("string", "app_name", "NewPipe")
+        applicationId = "ua.bashaiev.youtubefree"
+        resValue("string", "app_name", "YouTube Free")
         minSdk {
             version = release(NEWPIPE_VERSION_SDK_MIN)
         }
@@ -57,6 +57,15 @@ configure<ApplicationExtension> {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("personal") {
+            storeFile = System.getenv("YT_KEYSTORE_PATH")?.let { file(it) }
+            storePassword = System.getenv("YT_KEYSTORE_PASSWORD")
+            keyAlias = "youtubefree"
+            keyPassword = System.getenv("YT_KEYSTORE_PASSWORD")
+        }
+    }
+
     buildTypes {
         debug {
             isDebuggable = true
@@ -64,17 +73,20 @@ configure<ApplicationExtension> {
             // suffix the app id and the app name with git branch name
             if (normalizedWorkingBranch.isEmpty() || workingBranch in defaultBranches) {
                 applicationIdSuffix = ".debug"
-                resValue("string", "app_name", "NewPipe Debug")
+                resValue("string", "app_name", "YouTube Free Debug")
             } else {
                 applicationIdSuffix = ".debug.$normalizedWorkingBranch"
-                resValue("string", "app_name", "NewPipe $workingBranch")
+                resValue("string", "app_name", "YouTube Free Debug")
             }
         }
 
         release {
+            if (System.getenv("YT_KEYSTORE_PATH") != null) {
+                signingConfig = signingConfigs.getByName("personal")
+            }
             System.getProperty("packageSuffix")?.let { suffix ->
                 applicationIdSuffix = suffix
-                resValue("string", "app_name", "NewPipe $suffix")
+                resValue("string", "app_name", "YouTube Free")
             }
             isMinifyEnabled = true
             isShrinkResources = true
@@ -92,10 +104,10 @@ configure<ApplicationExtension> {
             // suffix the app id and the app name with git branch name
             if (normalizedWorkingBranch.isEmpty() || workingBranch in defaultBranches) {
                 applicationIdSuffix = ".continuous"
-                resValue("string", "app_name", "NewPipe Continuous")
+                resValue("string", "app_name", "YouTube Free")
             } else {
                 applicationIdSuffix = ".continuous.$normalizedWorkingBranch"
-                resValue("string", "app_name", "NewPipe $workingBranch")
+                resValue("string", "app_name", "YouTube Free Debug")
             }
         }
     }

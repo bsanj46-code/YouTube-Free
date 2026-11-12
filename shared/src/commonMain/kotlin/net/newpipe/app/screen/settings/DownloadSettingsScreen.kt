@@ -32,7 +32,6 @@ import net.newpipe.app.composable.ListPreferenceEntry
 import net.newpipe.app.composable.PreferenceRow
 import net.newpipe.app.composable.SwitchPreference
 import net.newpipe.app.composable.TopAppBar
-import net.newpipe.app.composable.noFileManagerMessage
 import net.newpipe.app.navigation.Navigator
 import net.newpipe.app.platform.DownloadFolderError
 import net.newpipe.app.platform.DownloadStorageActions
@@ -74,6 +73,8 @@ import newpipe.shared.generated.resources.invalid_directory
 import newpipe.shared.generated.resources.max_retry_desc
 import newpipe.shared.generated.resources.max_retry_msg
 import newpipe.shared.generated.resources.no_app_to_open_intent
+import newpipe.shared.generated.resources.no_appropriate_file_manager_message
+import newpipe.shared.generated.resources.no_appropriate_file_manager_message_android_10
 import newpipe.shared.generated.resources.no_available_dir
 import newpipe.shared.generated.resources.none
 import newpipe.shared.generated.resources.ok
@@ -314,6 +315,8 @@ private fun DownloadFolderErrorDialog(
     storageAccessFrameworkConfigurable: Boolean,
     onDismiss: () -> Unit
 ) {
+    val safTitle = stringResource(Res.string.downloads_storage_use_saf_title)
+
     val title = when (error) {
         DownloadFolderError.NO_FILE_MANAGER -> {
             stringResource(Res.string.no_app_to_open_intent)
@@ -329,9 +332,19 @@ private fun DownloadFolderErrorDialog(
         }
     }
 
+    // Only Android 9 and below can be told to turn SAF off
+    val fileManagerMessage = when {
+        storageAccessFrameworkConfigurable -> {
+            stringResource(Res.string.no_appropriate_file_manager_message, safTitle)
+        }
+
+        else -> {
+            stringResource(Res.string.no_appropriate_file_manager_message_android_10)
+        }
+    }
     val message = when (error) {
         DownloadFolderError.NO_FILE_MANAGER -> {
-            noFileManagerMessage(storageAccessFrameworkConfigurable)
+            fileManagerMessage
         }
 
         DownloadFolderError.INVALID_DIRECTORY -> {
